@@ -31,6 +31,6 @@ jobs:
         run: |
           yarn
           yarn theia build
-          cd plugins\remix-plugin-manager
+          cd plugins/remix-plugin-manager
           yarn
           yarn run build
