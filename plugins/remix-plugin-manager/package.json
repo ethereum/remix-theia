@@ -1,44 +1,41 @@
 {
-      "name": "remix-plugin-manager",
-      "publisher": "theia",
-      "keywords": [
-        "theia-plugin"
-      ],
-      "version": "0.0.1",
-      "license": "none",
-      
-      "files": [
-        "src"
-      ],
-      "activationEvents": [
-        "*"
-      ],
-      "dependencies": {
-        "@remixproject/engine": "0.3.3",
-        "@remixproject/engine-theia": "0.3.3"
-      },
-      "devDependencies": {
-        "@theia/plugin": "latest",
-        "@theia/plugin-packager": "latest",
-        "rimraf": "latest",
-        "typescript-formatter": "7.2.2",
-        "typescript": "4.1.2"
-      },
-      "scripts": {
-        "prepare": "yarn run clean && yarn run build",
-        "clean": "rimraf lib",
-        "format-code": "tsfmt -r",
-        "watch": "tsc -watch",
-        "compile": "tsc", 
-        "build": "yarn run format-code && yarn run compile && theia-plugin pack"
-      },
-      "engines": {
-        "theiaPlugin": "next"
-      },
-      "theiaPlugin": {
-          
-          
-            "backend": "lib/remix-plugin-manager-backend.js"
-          
-      }
+  "name": "remix-plugin-manager",
+  "publisher": "theia",
+  "keywords": [
+    "theia-plugin"
+  ],
+  "version": "0.0.1",
+  "license": "none",
+  "files": [
+    "src"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "dependencies": {
+    "@remixproject/engine": "0.3.3",
+    "@remixproject/engine-theia": "0.3.3"
+  },
+  "devDependencies": {
+    "@theia/plugin": "latest",
+    "@theia/plugin-packager": "latest",
+    "jest": "26.2.2",
+    "rimraf": "^3.0.2",
+    "typescript": "4.1.2",
+    "typescript-formatter": "7.2.2"
+  },
+  "scripts": {
+    "prepare": "yarn run clean && yarn run build",
+    "clean": "rimraf lib",
+    "format-code": "tsfmt -r",
+    "watch": "tsc -watch",
+    "compile": "tsc",
+    "build": "yarn run format-code && yarn run compile && theia-plugin pack"
+  },
+  "engines": {
+    "theiaPlugin": "next"
+  },
+  "theiaPlugin": {
+    "backend": "lib/remix-plugin-manager-backend.js"
+  }
 }

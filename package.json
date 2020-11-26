@@ -4,7 +4,6 @@
       "@theia/callhierarchy": "next",
       "@theia/file-search": "next",
       "@theia/git": "next",
-      "@theia/plugin":"next",
       "@theia/plugin-dev":"next",
       "@theia/plugin-ext":"next",
       "@theia/markers": "next",
@@ -19,11 +18,20 @@
       "@theia/search-in-workspace": "next",
       "@theia/terminal": "next"
     },
+    "devDependeny": {
+      "rimraf": "latest",
+      "@theia/plugin":"next"
+    },
+    "scripts": {
+        "prepare": "yarn run clean && yarn run build",
+        "clean": "rimraf lib",
+        "start": "theia start --plugins=local-dir:./.plugins",
+        "build": "theia build"
+    },
     "devDependencies": {
       "@theia/cli": "next"
     },
-    "theiaPluginsDir":"plugins",
-    "theiaPlugins" :{
-      
+    "theiaPluginsDir":".plugins",
+    "theiaPlugins": {
     }
-  }
+}
