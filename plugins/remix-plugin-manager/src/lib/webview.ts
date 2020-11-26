@@ -3,7 +3,7 @@ import { Message, Profile, ExternalProfile } from '@remixproject/plugin-utils'
 import * as theia from '@theia/plugin';
 import { join, isAbsolute, parse as parsePath } from 'path'
 import { promises as fs, watch } from 'fs'
-import { get } from 'https'
+// import { get } from 'https'
 import { parse as parseUrl } from 'url'
 
 interface WebviewOptions extends PluginConnectorOptions {
@@ -165,36 +165,55 @@ function remoteHtml(url: string, profile: Profile, options: WebviewOptions) {
 
 
 /** Fetch remote ressource with http */
-function fetch(url: string): Promise<string> {
-    return new Promise((resolve, reject) => {
-        get(url, res => {
-            let text = ''
-            res.on('data', data => text += data)
-            res.on('end', (_: any) => resolve(text))
-            res.on('error', err => reject(err))
-        })
-    })
-}
+// function fetch(url: string): Promise<string> {
+//     return new Promise((resolve, reject) => {
+//         get(url, res => {
+//             let text = ''
+//             res.on('data', data => text += data)
+//             res.on('end', (_: any) => resolve(text))
+//             res.on('error', err => reject(err))
+//         })
+//     })
+// }
 
 
 /** Get code from remote source */
 async function setRemoteHtml(webview: theia.Webview, baseUrl: string) {
-    const matchLinks = /(href|src)="([^"]*)"/g
-    const index = `${baseUrl}/index.html`
+    // const matchLinks = /(href|src)="([^"]*)"/g
+    // const index = `${baseUrl}/index.html`
 
 
-    // Vscode requires URI format from the extension root to work
-    const toRemoteUrl = (original: any, prefix: 'href' | 'src', link: string) => {
-        // For: <base href="#" /> && remote url : <link href="https://cdn..."/>
-        const isRemote = isHttpSource(parseUrl(link).protocol)
-        if (link === '#' || isRemote) {
-            return original
-        }
-        // For scripts & links
-        const path = join(baseUrl, link)
-        return `${prefix}="${path}"`
-    }
+    // // Vscode requires URI format from the extension root to work
+    // const toRemoteUrl = (original: any, prefix: 'href' | 'src', link: string) => {
+    //     // For: <base href="#" /> && remote url : <link href="https://cdn..."/>
+    //     const isRemote = isHttpSource(parseUrl(link).protocol)
+    //     if (link === '#' || isRemote) {
+    //         return original
+    //     }
+    //     // For scripts & links
+    //     const path = join(baseUrl, link)
+    //     return `${prefix}="${path}"`
+    // }
 
-    const html = await fetch(index)
-    webview.html = html.replace(matchLinks, toRemoteUrl)
+    // const html = await fetch(index)
+    // webview.html = html.replace(matchLinks, toRemoteUrl)
+    webview.html = `<html><head></head><body><iframe id="content" src="${baseUrl}" title="External content"></iframe>
+    <script>
+        vscodeAPI = acquireVsCodeApi();
+        
+        iframe = document.getElementById('content');
+        'use strict';
+        
+        iframe.contentWindow.addEventListener('message', function(evt) {
+            console.log('Got message from Iframe: '+JSON.stringify(evt));
+            vscodeAPI.postMessage(evt);
+        });
+
+        window.addEventListener('message', function(evt) {
+            console.log('Got message from theia: '+JSON.stringify(evt));
+            iframe.contentWindow.postMessage(JSON.parse(JSON.stringify(evt)))
+        });
+        
+    </script>
+    </body></html>`
 }
