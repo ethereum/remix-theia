@@ -2,6 +2,7 @@ import * as theia from '@theia/plugin';
 import { Engine, Plugin, PluginManager } from '@remixproject/engine';
 import { FileManagerPlugin } from './lib/filemanager';
 import { WebviewPlugin } from './lib/webview';
+import { ThemePlugin } from './lib/theme';
 
 
 export function start(context: theia.PluginContext) {
@@ -91,16 +92,16 @@ class RemixPlugin {
         this.engine = new Engine()
 
         this.manager = new PluginManager()
+        const themePlugin = new ThemePlugin
         const fileManager = new FileManagerPlugin()
-        this.engine.register([this.manager, fileManager]);
-        this.manager.activatePlugin([fileManager.name]).then(res => {
+        this.engine.register([this.manager, fileManager,themePlugin]);
+        this.manager.activatePlugin([fileManager.name, themePlugin.name]).then(res => {
             this.active = true;
-            // theia.window.showInformationMessage('PluginManager activated');
-        }).catch(error => theia.window.showInformationMessage('Error on plugin activation ' + error));
+        }, error => theia.window.showInformationMessage('Error on plugin activation ' + error));
     }
 
     async togglePlugin() {
-        const profile = pluginProfile[4]
+        const profile = pluginProfile[1]
         const name = profile.name
         if (!this.engine.isRegistered(name)) {
                 const webview = new WebviewPlugin({ ...profile }, {
