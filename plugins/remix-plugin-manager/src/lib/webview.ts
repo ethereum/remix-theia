@@ -19,7 +19,7 @@ export class WebviewPlugin extends PluginConnector {
   panel?: theia.WebviewPanel
   options: WebviewOptions
 
-  constructor(profile: Profile & ExternalProfile, options: WebviewOptions) {
+  constructor(profile: Profile & ExternalProfile, options: WebviewOptions, private deactivationCallback?:()=>void) {
     super(profile)
     this.setOptions(options)
   }
@@ -40,8 +40,9 @@ export class WebviewPlugin extends PluginConnector {
       this.listeners = [
         this.panel.webview.onDidReceiveMessage(msg => { this.getMessage(msg) }),
         this.panel.onDidDispose(_ => {
-          // XXX: Broken at the moment because this.call does not work if the panel is already disposed
-          this.call('manager', 'deactivatePlugin', this.name);
+          if (this.deactivationCallback){
+            this.deactivationCallback();
+          }
         }),
         this.panel,
       ]
@@ -109,6 +110,13 @@ export class WebviewPlugin extends PluginConnector {
         localResourceRoots: [theia.Uri.file(baseUrl)]
       }
     )
+    if ('icon' in profile){
+      try {
+        panel.iconPath = theia.Uri.parse(profile['icon']);
+      } catch(e) {
+        theia.window.showErrorMessage('Uri for the icon of the plugin is not valid: '+JSON.stringify(e))
+      }
+    }
     this.setLocalHtml(panel.webview, baseUrl)
 
     // Devmode
@@ -158,6 +166,13 @@ export class WebviewPlugin extends PluginConnector {
       options.column || theia.window.activeTextEditor?.viewColumn || theia.ViewColumn.One,
       { enableScripts: true }
     )
+    if ('icon' in profile){
+      try {
+        panel.iconPath = theia.Uri.parse(profile['icon']);
+      } catch(e) {
+        theia.window.showErrorMessage('Uri for the icon of the plugin is not valid: '+JSON.stringify(e))
+      }
+    }
     this.setRemoteHtml(panel.webview, baseUrl)
     return panel
   }
