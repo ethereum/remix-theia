@@ -1,5 +1,5 @@
 import { PluginConnector, PluginConnectorOptions } from '@remixproject/engine'
-import { Message, Profile, ExternalProfile } from '@remixproject/plugin-utils'
+import { Message, Profile, ExternalProfile, LocationProfile } from '@remixproject/plugin-utils'
 import * as theia from '@theia/plugin';
 import { join, isAbsolute, parse as parsePath } from 'path'
 import { promises as fs, watch } from 'fs'
@@ -19,7 +19,7 @@ export class WebviewPlugin extends PluginConnector {
   panel?: theia.WebviewPanel
   options: WebviewOptions
 
-  constructor(profile: Profile & ExternalProfile, options: WebviewOptions, private deactivationCallback?:()=>void) {
+  constructor(profile: Profile & ExternalProfile, options: WebviewOptions, private deactivationCallback?: () => void) {
     super(profile)
     this.setOptions(options)
   }
@@ -40,7 +40,7 @@ export class WebviewPlugin extends PluginConnector {
       this.listeners = [
         this.panel.webview.onDidReceiveMessage(msg => { this.getMessage(msg) }),
         this.panel.onDidDispose(_ => {
-          if (this.deactivationCallback){
+          if (this.deactivationCallback) {
             this.deactivationCallback();
           }
         }),
@@ -101,22 +101,7 @@ export class WebviewPlugin extends PluginConnector {
     const { ext } = parsePath(url)
     const baseUrl = ext === '.html' ? parsePath(url).dir : url
 
-    const panel = theia.window.createWebviewPanel(
-      profile.name,
-      profile.displayName || profile.name,
-      options.column || theia.window.activeTextEditor?.viewColumn || theia.ViewColumn.One,
-      {
-        enableScripts: true,
-        localResourceRoots: [theia.Uri.file(baseUrl)]
-      }
-    )
-    if ('icon' in profile){
-      try {
-        panel.iconPath = theia.Uri.parse(profile['icon']);
-      } catch(e) {
-        theia.window.showErrorMessage('Uri for the icon of the plugin is not valid: '+JSON.stringify(e))
-      }
-    }
+    const panel = this.createWebviewPanel(profile, options, [theia.Uri.file(baseUrl)])
     this.setLocalHtml(panel.webview, baseUrl)
 
     // Devmode
@@ -125,6 +110,44 @@ export class WebviewPlugin extends PluginConnector {
       watch(index).on('change', _ => this.setLocalHtml(panel.webview, baseUrl))
     }
     return panel
+  }
+
+  private createWebviewPanel(profile: Profile, options: WebviewOptions, localResourceRoots: ReadonlyArray<theia.Uri>) {
+    var column: any = options.column;
+    if (!column) {
+      const location = (profile as unknown as LocationProfile).location
+      if (location) {
+        switch (location) {
+          case 'sidePanel':
+            column = { area: theia.WebviewPanelTargetArea.Left }
+            break;
+          case 'mainPanel':
+            column = { area: theia.WebviewPanelTargetArea.Main }
+            break;
+          default:
+            theia.window.showInformationMessage('Given location for plugin ' + profile.displayName + ' is unknown: ' + location)
+            break;
+        }
+      }
+    }
+    if (!column){
+      column = theia.window.activeTextEditor?.viewColumn || theia.ViewColumn.One
+    }
+    const panel = theia.window.createWebviewPanel(
+      profile.name,
+      profile.displayName || profile.name,
+      column,
+      { enableScripts: true, localResourceRoots: localResourceRoots }
+
+    )
+    if ('icon' in profile) {
+      try {
+        panel.iconPath = theia.Uri.parse(profile['icon']);
+      } catch (e) {
+        theia.window.showErrorMessage('Uri for the icon of the plugin is not valid: ' + JSON.stringify(e))
+      }
+    }
+    return panel;
   }
 
   /** Get code from local source */
@@ -160,19 +183,7 @@ export class WebviewPlugin extends PluginConnector {
   remoteHtml(url: string, profile: Profile, options: WebviewOptions) {
     const { ext } = parsePath(url)
     const baseUrl = ext === '.html' ? parsePath(url).dir : url
-    const panel = theia.window.createWebviewPanel(
-      profile.name,
-      profile.displayName || profile.name,
-      options.column || theia.window.activeTextEditor?.viewColumn || theia.ViewColumn.One,
-      { enableScripts: true }
-    )
-    if ('icon' in profile){
-      try {
-        panel.iconPath = theia.Uri.parse(profile['icon']);
-      } catch(e) {
-        theia.window.showErrorMessage('Uri for the icon of the plugin is not valid: '+JSON.stringify(e))
-      }
-    }
+    const panel = this.createWebviewPanel(profile, options, [])
     this.setRemoteHtml(panel.webview, baseUrl)
     return panel
   }
