@@ -2,6 +2,7 @@ import { Plugin } from '@remixproject/engine'
 import { API } from '@remixproject/plugin-utils'
 import { ITheme, Theme, themeProfile } from '@remixproject/plugin-api'
 import { window, ColorThemeKind, Disposable, ColorTheme } from '@theia/plugin'
+import * as theia from '@theia/plugin'
 
 // There is no way to get the value from the theme so the best solution is to reference the css varibles in webview
 function getTheme(color: ColorTheme): Theme {
@@ -43,11 +44,17 @@ export class ThemePlugin extends Plugin implements API<ITheme> {
   }
 
   onActivation() {
-    this.listener = window.onDidChangeActiveColorTheme(color => this.emit('themeChanged', getTheme(color)))
+    if (window.onDidChangeActiveColorTheme) {
+      this.listener = window.onDidChangeActiveColorTheme(color => this.emit('themeChanged', getTheme(color)))
+    } else {
+      theia.window.showInformationMessage('theme change notification from theia is not available for remix plugins')
+    }
   }
 
   onDeactivation() {
-    this.listener.dispose()
+    if (this.listener) {
+      this.listener.dispose()
+    }
   }
 
   currentTheme(): Theme {

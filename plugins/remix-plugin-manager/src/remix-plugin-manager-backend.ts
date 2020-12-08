@@ -14,8 +14,15 @@ export function start(context: theia.PluginContext) {
         id: 'remix-pluginmanager-toggle',
         label: "Toggle remix plugin"
     };
+    const solidityCompileCommand = {
+        id: 'solidity-compiler-compile',
+        label: "Compile with solidity"
+    };
     context.subscriptions.push(theia.commands.registerCommand(toggleRemixPluginCommand, (...args: any[]) => {
         plugin.togglePlugin();
+    }));
+    context.subscriptions.push(theia.commands.registerCommand(solidityCompileCommand, (...args: any[]) => {
+        plugin.solidityCompile();
     }));
 }
 
@@ -88,20 +95,26 @@ const pluginProfile = [
 class RemixPlugin {
     manager: PluginManager;
     engine: Engine;
-    helloWorld: HelloWorldPlugin;
-    active: boolean = false;
+    enginePlugin: EnginePlugin;
 
     constructor(private context: theia.PluginContext) {
         this.engine = new Engine()
 
+        const plugins: Plugin[] = [];
         this.manager = new PluginManager()
-        const themePlugin = new ThemePlugin
-        const fileManager = new FileManagerPlugin()
-        const nativeCompilerPlugin = new NativeSolcPlugin
-        this.engine.register([this.manager, fileManager, themePlugin, nativeCompilerPlugin]);
-        this.manager.activatePlugin([fileManager.name, themePlugin.name, nativeCompilerPlugin.name]).then(res => {
-            this.active = true;
+        plugins.push(this.manager)
+        this.enginePlugin = new EnginePlugin(this.engine)
+        plugins.push(this.enginePlugin)
+        plugins.push(new ThemePlugin)
+        plugins.push(new FileManagerPlugin())
+        plugins.push(new NativeSolcPlugin)
+        this.engine.register(plugins);
+        this.manager.activatePlugin(plugins.map(p => p.name)).then(res => {
         }, error => theia.window.showInformationMessage('Error on plugin activation ' + error));
+    }
+
+    async solidityCompile() {
+        this.manager.call('solidity','compile')
     }
 
     async togglePlugin() {
@@ -127,12 +140,18 @@ class RemixPlugin {
     }
 }
 
-class HelloWorldPlugin extends Plugin {
-    constructor() {
-        super({ name: 'hello', methods: ["helloWorld"] })
+class EnginePlugin extends Plugin {
+    constructor(protected engine: Engine) {
+        super({ name: 'engine', displayName: 'Engine API', methods: ['register', 'isRegistered', 'remove'] })
     }
 
-    helloWorld(): string {
-        return 'hello from HelloWorldPlugin :)'
+    register(plugins: Plugin | Plugin[]): string | string[] {
+        return this.engine.register(plugins);
+    }
+    isRegistered(name: string) {
+        return this.engine.isRegistered(name);
+    }
+    remove(names: string | string[]) {
+        return this.engine.remove(names);
     }
 }
