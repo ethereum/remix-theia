@@ -110,11 +110,15 @@ class RemixPlugin {
         plugins.push(new NativeSolcPlugin)
         this.engine.register(plugins);
         this.manager.activatePlugin(plugins.map(p => p.name)).then(res => {
+            this.manager.on('solidity', 'compilationFinished', (filename:string)=>{
+                theia.window.showInformationMessage('Compiled ' + filename);
+            })
         }, error => theia.window.showInformationMessage('Error on plugin activation ' + error));
+        
     }
 
     async solidityCompile() {
-        this.manager.call('solidity','compile')
+        this.manager.call('solidity', 'compile')
     }
 
     async togglePlugin() {

@@ -130,7 +130,7 @@ export class WebviewPlugin extends PluginConnector {
         }
       }
     }
-    if (!column){
+    if (!column) {
       column = theia.window.activeTextEditor?.viewColumn || theia.ViewColumn.One
     }
     const panel = theia.window.createWebviewPanel(
@@ -182,7 +182,7 @@ export class WebviewPlugin extends PluginConnector {
   /** Create panel webview based on remote HTML source */
   remoteHtml(url: string, profile: Profile, options: WebviewOptions) {
     const { ext } = parsePath(url)
-    const baseUrl = ext === '.html' ? parsePath(url).dir : url
+    var baseUrl = ext === '.html' ? parsePath(url).dir : url
     const panel = this.createWebviewPanel(profile, options, [])
     this.setRemoteHtml(panel.webview, baseUrl)
     return panel
@@ -213,7 +213,11 @@ export class WebviewPlugin extends PluginConnector {
         return original
       }
       // For scripts & links
-      const path = join(baseUrl, link)
+      var path = join(baseUrl, link)
+      if (path.startsWith('https:/') && !path.startsWith('https://')) {
+        path = 'https://' + path.substring('https:/'.length)
+      }
+      theia.window.showInformationMessage('joined link to ' + path)
       return `${prefix}="${path}"`
     }
 

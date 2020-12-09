@@ -6,7 +6,8 @@ import * as theia from '@theia/plugin'
 
 // There is no way to get the value from the theme so the best solution is to reference the css varibles in webview
 function getTheme(color: ColorTheme): Theme {
-  const brightness = color.kind === ColorThemeKind.Dark ? 'dark' : 'light';
+  //TODO Got color and ColorThemeKind as undefined
+  const brightness = color?.kind === ColorThemeKind?.Dark ? 'dark' : 'light';
   return {
     brightness,
     colors: {

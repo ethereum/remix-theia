@@ -15,7 +15,8 @@
   "dependencies": {
     "@remixproject/engine": "0.3.3",
     "@remixproject/engine-theia": "0.3.3",
-    "@remixproject/plugin": "0.3.3"
+    "@remixproject/plugin": "0.3.3",
+    "solc": "^0.7.5"
   },
   "devDependencies": {
     "@theia/plugin": "latest",

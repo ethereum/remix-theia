@@ -1,37 +1,38 @@
 {
-    "private": true,
-    "dependencies": {
-      "@theia/callhierarchy": "next",
-      "@theia/file-search": "next",
-      "@theia/git": "next",
-      "@theia/plugin-dev":"next",
-      "@theia/plugin-ext":"next",
-      "@theia/markers": "next",
-      "@theia/messages": "next",
-      "@theia/mini-browser": "next",
-      "@theia/debug": "next",
-      "@theia/navigator": "next",
-      "@theia/outline-view": "next",
-      "@theia/plugin-ext-vscode": "next",
-      "@theia/preferences": "next",
-      "@theia/preview": "next",
-      "@theia/search-in-workspace": "next",
-      "@theia/terminal": "next"
-    },
-    "devDependeny": {
-      "rimraf": "latest",
-      "@theia/plugin":"next"
-    },
-    "scripts": {
-        "prepare": "yarn run clean && yarn run build",
-        "clean": "rimraf lib",
-        "start": "theia start --plugins=local-dir:./.plugins",
-        "build": "theia build"
-    },
-    "devDependencies": {
-      "@theia/cli": "next"
-    },
-    "theiaPluginsDir":".plugins",
-    "theiaPlugins": {
-    }
+  "private": true,
+  "dependencies": {
+    "@theia/callhierarchy": "next",
+    "@theia/debug": "next",
+    "@theia/file-search": "next",
+    "@theia/git": "next",
+    "@theia/markers": "next",
+    "@theia/messages": "next",
+    "@theia/mini-browser": "next",
+    "@theia/navigator": "next",
+    "@theia/outline-view": "next",
+    "@theia/plugin-dev": "next",
+    "@theia/plugin-ext": "next",
+    "@theia/plugin-ext-vscode": "next",
+    "@theia/preferences": "next",
+    "@theia/preview": "next",
+    "@theia/search-in-workspace": "next",
+    "@theia/terminal": "next",
+    "remix-url-resolver": "^0.0.16",
+    "solc": "^0.7.5"
+  },
+  "devDependeny": {
+    "rimraf": "latest",
+    "@theia/plugin": "next"
+  },
+  "scripts": {
+    "prepare": "yarn run clean && yarn run build",
+    "clean": "rimraf lib",
+    "start": "theia start --plugins=local-dir:./.plugins",
+    "build": "theia build"
+  },
+  "devDependencies": {
+    "@theia/cli": "next"
+  },
+  "theiaPluginsDir": ".plugins",
+  "theiaPlugins": {}
 }
