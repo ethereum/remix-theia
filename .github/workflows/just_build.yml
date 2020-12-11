@@ -34,3 +34,4 @@ jobs:
           cd plugins/remix-plugin-manager
           yarn
           yarn run build
+

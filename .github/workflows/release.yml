@@ -1,0 +1,52 @@
+name: Release_Build
+
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+
+name: Create Release
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Use Node.js environment
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: '12'    
+      - name: yarn, build
+        run: |
+          yarn
+          yarn theia build
+          cd plugins/remix-plugin-manager
+          yarn
+          yarn run build
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - Theia plugin with remix plugin engine
+            - "Toggle remix plugin" to show sourcify and solhint UI
+            - "Compile with solidity" command to compile the current editor content by solidity compiler
+          draft: true
+          prerelease: false
+      - name: Attach plugin package to release
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./plugins/remix-plugin-manager/remix_plugin_manager.theia
+          asset_name: remix_plugin_manager.theia
+          asset_content_type: application/zip
