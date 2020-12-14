@@ -20,10 +20,6 @@
     "remix-url-resolver": "^0.0.16",
     "solc": "^0.7.5"
   },
-  "devDependeny": {
-    "rimraf": "latest",
-    "@theia/plugin": "next"
-  },
   "scripts": {
     "prepare": "yarn run clean && yarn run build",
     "clean": "rimraf lib",
@@ -31,6 +27,9 @@
     "build": "theia build"
   },
   "devDependencies": {
+    "rimraf": "latest",
+    "@theia/plugin": "next",
+    "lerna": "^2.4.0",
     "@theia/cli": "next"
   },
   "theiaPluginsDir": ".plugins",

@@ -14,6 +14,36 @@ Install the plugin by URL https://github.com/ethereum/remix-theia/releases/downl
 
 Open the plugins by pressing F1 and type `Toggle remix plugin` to show the remix plugins on the left side, or `Compile with solidity` to compile the [solidity](https://docs.soliditylang.org) contract in the current editor.
 
+# Development
+
+Install [nvm](https://github.com/creationix/nvm#install-script).
+
+    curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.5/install.sh | bash
+
+Install npm and node.
+
+    nvm install 12
+    nvm use 12
+
+Install yarn.
+
+    npm install -g yarn
+
+## Running theia
+
+    yarn install
+
+    yarn theia start
+
+Open http://localhost:3000 in the browser.
+
+Start Hosted instance with plugin enabled by pressing `F1`and choose `Plugin: Hosted Instance` and select `plugin/remix-plugin-manager` as folder.
+
+Start watching of the plugin manager.
+
+    cd plugins/remix-plugin-manager
+    yarn watch
+
 ## Publishing Remix Plugin Manager
 
 Each release triggers a build on github.
