@@ -1,0 +1,26 @@
+image:
+  file: .gitpod.dockerfile
+tasks:
+  - init: yarn
+    command: |
+      gp sync-done init
+      yarn --cwd {{extensionName}} watch
+  - command: |
+      gp sync-await init
+      yarn --cwd plugins/remix-plugin-manager watch
+    name: Watch browser-app
+    openMode: split-right
+  - command: |
+      gp sync-await init
+      yarn --cwd plugins/remix-plugin-manager start ..
+    name: Run browser-app
+    openMode: tab-after
+ports:
+  - port: 3000 # expose Theia port
+  - port: 6080 # ignore VNC port
+    onOpen: ignore
+  - port: 5900 # ignore VNC port
+    onOpen: ignore
+github:
+  prebuilds:
+    branches: true
